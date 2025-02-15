@@ -58,7 +58,7 @@ interface ICard {
   title: string;
   category: string;
   price: number;
-  basket: boolean;
+  <!-- basket: boolean; -->
 }
 ```
 Пользователь
@@ -72,6 +72,13 @@ interface IUser {
 
 ```
 
+сохранение масс карточек отложенных в корзину
+```
+export interface IBascetData {
+  cardsbasret: ICard[]
+}
+```
+
 Интерфейс для хранения массива товаров
 
 ```
@@ -80,7 +87,7 @@ interface ICardData {
   preview: string | null;
   addCard(card: ICard): void;
   deleteCard(cardId: string, payload: Function | null): void;
-  updateCard(card: ICard, payload: Function | null): void;
+  <!-- updateCard(card: ICard, payload: Function | null): void; -->
   getCard(cardId: string): ICard
 }
 ```
@@ -96,7 +103,7 @@ interface IUserData {
 Данные карточки, используемые в модальном окне для просмотра отложенных товаров в корзину
 
 ```
-type ICardBascet = Pick<ICard, 'title' | 'price' | 'id' | 'basket'>
+type ICardBascet = Pick<ICard, 'title' | 'price' | 'id'>
 ```
 Данные пользователя, используемые в форме ввода контактов
 
@@ -111,21 +118,23 @@ type IOrderForm = Pick<IUser, 'payment' | 'address'>
 
 Массив для отправки данных пользователя на сервер
 ```
- interface IOrder extends IFormContact, IOrderForm, ICardBascet {
-  items: string[];
+interface IOrder extends IFormContact, IOrderForm, IBidprice {
+  items: string[]
 }
 ```
 
 Получает общую сумму заказа
 ```
 interface IBidprice {
-  price: number
+  total: number
 }
 ```
-
-// export interface IOrderResult {
-//   id: string;
-// }
+```
+interface IOrderResult {
+  id: string;
+  total: number
+}
+```
 
 ## Базовый код
 #### Класс Api 
@@ -173,7 +182,7 @@ interface IBidprice {
 Методы для взаимодействия с этими данными:
  - addCard(card: ICard): void Добавляет карточку в конец массива и вызывает событие изменение массива;
  - deleteCard(cardId: string, payload: Function | null): void удаляет карточку из массива;
- - updateCard(card: ICard, payload: Function | null): void обновляет данные карточки в массиве;
+ <!-- - updateCard(card: ICard, payload: Function | null): void обновляет данные карточки в массиве; -->
  - getCard(cardId: string): ICard возвращает карточку по ее id;
 
  ### Класс UserData
@@ -188,9 +197,9 @@ interface IBidprice {
   Методы для взаимодействия с этими данными:
    - getUserInfo():IOrderFormContact & IOrderFormOption возвращает данные, указанные пользователем;
    - setUserInfo(userData: IUser): void сохраняет данные пользователя;
-   - chackUserValidation(data: Record<keyof IUser, string>): boolean проверяет введенные данные на валидность;
+   <!-- - chackUserValidation(data: Record<keyof IUser, string>): boolean проверяет введенные данные на валидность; -->
 
-   ### Класс Basket
+   <!-- ### Класс Basket -->
 
 ## Компоненты представления
 ### Класс Card 
@@ -200,12 +209,12 @@ interface IBidprice {
 Поля класса содержат элементы разметки карточек.
 
 Методы:
-- setData(cardData: ICard, cardId: string): void - заполняет атрибуты элементов данными и сохраняет id карточки для передачи нужной карточки при клике;
+- через сеттеры  заполняет поля каждой из карточек и сохраняет id каждой;
 - deleteCard(): void - метод для удаления карточки из массива выбранных;
 - геттер id - возвращает уникальный id карточки.
 
 ### Класс CardsContainer
-Отвечает за отображение блока карточек на главной странице. В конструкторепринимает контейнер в котором размещаются карточки. В метод render принимает массив элементов разметки карточек.
+Отвечает за отображение блока карточек на главной странице. В конструкторепринимает контейнер в котором размещаются карточки.Метод render наследует от базового класса component.
 
 ### Класс modal
 Реализует модальное окно. Предоставляет Методы `open` и `close` для управления открытием и закрытием модального окна. Устанавливает слушатели для закрытия модального окна (крестик, ESC, оверлей)
@@ -216,7 +225,7 @@ interface IBidprice {
 - events: IEvents - Брокер событий;
 - closeButton: HTMLButtonElement - кнопка закрытия модального окна;
 
-### Класс ModalBasket 
+### Класс Basket 
 Конструктор класса принимает темплейт содержимого корзины и `EventEmitter`, для генерации событий при изменениях и самбите; Устанавливает слушатели событий корзины. В полях класса хранится массив карточек, находящихся в корзине, общую сумму покупки, и кнопки удаления и оформления заказа:
  - list: HTMLElement;
  - _total: HTMLElement;
@@ -232,7 +241,10 @@ interface IBidprice {
 
 ## Интерфейс API-клиента
 ### Класс AppApi
-Принимает в конструктор экземпляр класса Api и предоставляет методы для взаимодействия с бекендом сервиса.
+Наследует класс Api. Принимает в конструктор базовый адрес для запроса на сервер и CDN для получения картинки. Предоставляет методы для взаимодействия с бекендом сервиса:
+- getCardItem(id: string): Promise<ICard> - запрос карточки по id;
+- getCardList(): Promise<ICard[]> - получение списка карточек;
+- order(order: IOrder): Promise<IOrderResult> - отправка даннных заказа на сервер;
 
 ## Брокер событий 
 ### Взаимодействие компонентов
@@ -242,6 +254,7 @@ interface IBidprice {
 События изменения данных:
 - `cards:changed` - изменение массива карточек;
 - `cards:basket` - изменение массива отложенных в корзину карточек;
+- `user:changed` - изменение данных пользователя
 
 События возникающие при взаимодействии пользователя с интерфейсом:
 - `card:click` - клик по карточке, для открытия ее в модальном окне;
