@@ -1,84 +1,64 @@
-import { IFormContact, IOrderForm, IUser, IUserData } from "../types";
+import { FormErrors, IForms, IUser, IUserData } from "../types";
 import { IEvents } from "./base/events";
 
 
 export class UserData implements IUserData {
-  protected email: string;
-  protected phone: string;
-  protected payment: string;
-  protected address: string;
   protected events: IEvents;
+	protected order: IForms = {
+		email: '',
+		phone: '',
+		address: '',
+    payment: '',
+		items: []
+};
+	protected formErrors: FormErrors = {};
 
   constructor(events: IEvents) {
 		this.events = events;
+		this.order = {
+			email: '',
+			phone: '',
+			address: '',
+			payment: '',
+			items: []
+		}
 	}
 
-  getUserInfo():IFormContact & IOrderForm {
-    return { 
-      email: this.email,
-      phone: this.phone,
-      payment: this.payment,
-      address: this.address
-    };
+  getUserInfo(field: keyof IUser) {
+		return this.order[field];
+    // return { 
+    //   email: this.order.email,
+    //   phone: this.order.phone,
+    //   payment: this.order.payment,
+    //   address: this.order.address,
+		// 	items: this.order.items
+    // };
   }
 
-	setUserInfo(userData: IUser) {
-		this.email = userData.email;
-		this.phone = userData.phone;
-		this.payment = userData.payment;
-		this.address = userData.address;
-		this.events.emit('user:changed');
+	setInputField(field: keyof IUser, value: string) {
+		this.order[field] = value;
+
+		if (this.validateOrder()) {
+				this.events.emit('order:ready', this.order);
+		}
+  }
+
+	validateOrder() {
+			const errors: typeof this.formErrors = {};
+			if (!this.order.email) {
+					errors.email = 'Необходимо указать email';
+			}
+			if (!this.order.phone) {
+					errors.phone = 'Необходимо указать телефон';
+			}
+			if (!this.order.address) {
+				errors.address = 'Необходимо указать адресс';
+		  }
+			if (!this.order.payment) {
+				errors.address = 'Необходимо выбрать способ оплаты';
+		  }
+			this.formErrors = errors;
+			this.events.emit('formErrors:change', this.formErrors);
+			return Object.keys(errors).length === 0;
 	}
-
-	// checkUserValidation(data: Record<keyof IUser, string>) {
-	// 	const isValid = !Boolean(validate(data, constraintsUser));
-	// 	return isValid;
-	// }
-
-	// checkAvatarValidation(data: Record<keyof IUser, string>) {
-	// 	const isValid = !Boolean(validate(data, constraintsAvatar));
-	// 	return isValid;
-	// }
-
-	// checkField(data: { field: keyof TUserPublicInfo; value: string }) {
-	// 	switch (data.field) {
-	// 		case 'about':
-	// 			return this.checkAbout(data.value);
-	// 		case 'name':
-	// 			return this.checkName(data.value);
-	// 		case 'avatar':
-	// 			return this.checkAvatar(data.value);
-	// 	}
-	// }
-
-	// checkName(value: string) {
-	// 	const result = validate.single(value, constraintsUser.name);
-	// 	if (result) {
-	// 		return result[0];
-	// 	} else {
-	// 		return '';
-	// 	}
-	// }
-
-	// checkAbout(value: string) {
-	// 	const result = validate.single(value, constraintsUser.about);
-	// 	if (result) {
-	// 		return result[0];
-	// 	} else {
-	// 		return '';
-	// 	}
-	// }
-
-	// checkAvatar(value: string) {
-	// 	const result = validate.single(value, constraintsAvatar.avatar);
-	// 	if (result) {
-	// 		return result[0];
-	// 	} else {
-	// 		return '';
-	// 	}
-	// }
-
-	// get id() {
-	// 	return this._id;
-	// }
 }

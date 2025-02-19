@@ -1,5 +1,5 @@
-import { ICard, IUser, TModelCard } from '../types';
-import { cloneTemplate, ensureElement } from '../utils/utils';
+import { TModelCard } from '../types';
+import { ensureElement } from '../utils/utils';
 import { Component } from './base/Component';
 import { IEvents } from './base/events';
 
@@ -34,78 +34,56 @@ export class Card extends Component<TModelCard> {
       );
     } else if(this.cardButton) {
       this.cardButton.addEventListener('click', () =>
-        this.events.emit('card:basket', { card: this.cardId, cardButton: this.cardButton })
+        this.events.emit('card:addToBasket', {card: this.cardId})
       );
     } else {
       this.container.addEventListener('click', () =>
-        this.events.emit('card:click', { card: this.cardId })
+        this.events.emit('card:openClick', { card: this.cardId })
       );
     }
 	}
 
-// set id(value: string) {
-//         this.container.dataset.id = value;
-//     }
+  set title(value: string) {
+      this.setText(this.cardTitle, value);
+  }
 
-//     get id(): string {
-//         return this.container.dataset.id || '';
-//     }
+  set image(value: string) {
+    this.setImage(this.cardImage, value, this.title)
+  }
 
-    set title(value: string) {
-        this.setText(this.cardTitle, value);
+  set description(value: string) {
+    this.setText(this.cardDescription, value);
+  }
+
+  set buttonDisebled(value: boolean) {
+    this.setDisabled(this.cardButton, value);
+  }
+
+  set buttonText(value: boolean) {
+    if (!value) {
+      this.cardButton.textContent = 'В корзину';
+    } else {
+      this.cardButton.textContent = 'Удалить из корзины';
     }
+  }
 
-    // get title(): string {
-    //     return this._title.textContent || '';
-    // }
+  set category(value: string) {
+    this.setText(this.cardCategory, value);
+  }
 
-    
-    set image(value: string) {
-      this.setImage(this.cardImage, value, this.title)
-    }
+  set price(value: string) {
+    this.cardPrice.textContent = value + ' ' + 'синапсов';
+  }
 
-    set description(value: string) {
-      this.setText(this.cardDescription, value);
-    }
+  set index(value: string) {
+    this.itemIndex.textContent = value
+  }
 
-    set buttonText(value: boolean) {
-      if (!value) {
-        this.cardButton.textContent = 'В корзину';
-      } else {
-        this.cardButton.textContent = 'Удалить из корзины';
-      }
-    }
+  set id(value: string) {
+    this.cardId = value;
+  }
 
-    set category(value: string) {
-      this.setText(this.cardCategory, value);
-    }
-
-    set price(value: string) {
-      this.cardPrice.textContent = value + ' ' + 'синапсов';
-    }
-
-    set index(value: string) {
-       this.itemIndex.textContent = value
-    }
-
-    // set _id(id) {
-    //   this.cardId = id;
-    // }
-
-    set id(value: string) {
-      this.cardId = value;
-    }
-
-    get _id() {
-      return this.cardId;
-    }
-
-    // get id(): string {
-    //   return this.container.dataset.id || '';
-    // }
-    
-    deleteCard() {
-      this.container.remove();
-      this.container = null;
-    }
+  get _id() {
+    return this.cardId;
+  }
 }

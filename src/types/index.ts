@@ -6,7 +6,6 @@ export interface ICard {
   title: string;
   category: string;
   price: number;
-  // selected: boolean;
 }
 
 export interface IUser {
@@ -16,43 +15,43 @@ export interface IUser {
   address: string;
 }
 
-export interface IBasketData {
-  cardsBasket: ICard[];
-  preview: string | null;
-  addCardBasket(card: ICard): void;
-  checkcard(cardId: string): boolean;
-  numbercards(): number;
-  clearBasket(): ICard[];
-}
-
 export interface ICardData {
   cards: ICard[];
   preview: string | null;
-  addCard(card: ICard): void;
-  deleteCard(cardId: string, payload: Function | null): void;
-  // updateCard(card: ICard, payload: Function | null): void;
-  getCard(cardId: string): ICard
+  addCard(card: TModelCard): void;
+  getBasketItems(): void;
+  getLengthBasket(): number;
+  getBasketTotal(): number;
+  deleteCard(): TModelCard[];
+  updateCard(card: TModelCard, value: boolean): void;
+  updateCardId(cardId: string): void;
+  getCard(cardId: string): TModelCard;
+  indexCard(card: TModelCard): string;
+  getIdSelectedCard(): void;
+  clearBasket(cardId: string[]): void;
 }
 
 export interface IUserData {
-  getUserInfo():IFormContact & IOrderForm;
-  setUserInfo(userData: IUser): void;
-  // chackUserValidation(data: Record<keyof IUser, string>): boolean
+  getUserInfo(field: keyof IUser): void;
+  setInputField(field: keyof IUser, value: string): void;
+  validateOrder(): boolean;
 }
 
 export type TModelCard = ICard & {selected: boolean}
 
-export type ICardBascet = Pick<ICard, 'id' >
+export type ICardId = Pick<ICard, 'id' >
 
 export type IFormContact = Pick<IUser, 'email' | 'phone'>
 
-export type IOrderForm = Pick<IUser, 'payment' | 'address'>
-
-export interface IOrder extends IFormContact, IOrderForm, IBidprice {
-  items: string[]
+export interface IOrder extends IFormContact, IUser, IBasketTotal {
+  items: string[];
 }
+export interface IForms extends IUser {
+  items: string[];
+}
+export type FormErrors = Partial<Record<keyof IForms, string>>;
 
-export interface IBidprice {
+export interface IBasketTotal {
   total: number
 }
 
