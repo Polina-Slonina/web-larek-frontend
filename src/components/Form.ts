@@ -1,3 +1,4 @@
+import { IUser } from "../types";
 import { ensureElement } from "../utils/utils";
 import { Component } from "./base/Component";
 import { IEvents } from "./base/events";
@@ -65,15 +66,5 @@ export class Form<T> extends Component<IForm> {
 
   set errors(value: string) {
       this.setText(this._errors, value);
-  }
-
-  
-
-  render(state: Partial<T> & IForm) {
-      const {valid, errors, ...inputs} = state;
-      super.render({valid, errors});
-      Object.assign(this, inputs);
-      return this.container;
-
   }
 }

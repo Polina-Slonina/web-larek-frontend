@@ -37,7 +37,7 @@ const modalContainer = new Modal(document.querySelector('#modal-container'), eve
 const cardsContainer = new CardsContainer(document.querySelector('.gallery'));
 
 // Переиспользуемые части интерфейса
-const cardPreview = new Card(cloneTemplate(cardTemplatePreview), events)
+
 const basket = new Basket(cloneTemplate(modalTemplatebasket), events);
 const order = new Form<IUser>(cloneTemplate(formOrder), events)
 const contacts = new Form<IUser>(cloneTemplate(formContacts), events)
@@ -61,6 +61,7 @@ api.getCardList()
 events.on('initialData:loaded', () => {
 	const cardsArray = cardsData.cards.map((card) => {
 		const cardCatalog = new Card(cloneTemplate(cardTemplateCatalog), events);
+    cardCatalog.categoryClass = card.category;
 		return cardCatalog.render(card);
 	});
 
@@ -72,8 +73,10 @@ events.on('card:openClick', ( data: {card: string}) => {
 	modalContainer.open();
   const cardId = data.card;
   const cardContent = cardsData.getCard(cardId);
-  if(cardContent.price === null) cardPreview.buttonDisebled = true;
+  const cardPreview = new Card(cloneTemplate(cardTemplatePreview), events)
+  cardContent.price === null ? cardPreview.buttonDisebled = true : cardPreview.buttonDisebled = false;
   cardPreview.buttonText = cardContent.selected;
+  cardPreview.categoryClass = cardContent.category;
   modalContainer.content = cardPreview.render(cardContent);
 })
 
@@ -82,7 +85,7 @@ events.on('mousedown', () => {
 	modalContainer.close();
 })
 
-// открисовыем отображение после клика на удалить/положить в корзину и обновляем данные карточки
+// отрисовыем отображение после клика на удалить/положить в корзину и обновляем данные карточки
 events.on('card:addToBasket', (data: {card: string}) => {
 	const cardId = data.card;
   cardsData.updateCardId(cardId);
@@ -129,11 +132,9 @@ events.on('modal:close', () => {
 
 // Открыть форму заказа
 events.on('order:open', () => {
+  // if(order.valid) order.valid = true
   modalContainer.render({
-      content: order.render({
-          valid: false,
-          errors: []
-      })
+      content: order.render()
   });
 });
 
@@ -144,7 +145,6 @@ events.on('formErrors:change', (errors: Partial<IUser>) => {
   order.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
   contacts.valid = !phone && !email;
   contacts.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
-  if (order.valid) order.buttonPayment = errors.payment;
 });
 
 // Изменилось одно из полей формы ордер
@@ -159,11 +159,9 @@ events.on('button:paymentChanged', (button: HTMLButtonElement) => {
 
 // Открыть форму заказа
 events.on('order:submit', () => {
+  contacts.errors = '';
   modalContainer.render({
-      content: contacts.render({
-          valid: false,
-          errors: []
-      })
+      content: contacts.render()
   });
 });
 
@@ -182,7 +180,6 @@ events.on('contacts:submit', () => {
     total: cardsData.getBasketTotal(),
     items: cardsData.getIdSelectedCard()
   };
-  console.log(orders)
   api.order(orders)
       .then((res) => {
           const success = new Success(cloneTemplate(successContainer), events);

@@ -38,7 +38,7 @@ export class Card extends Component<TModelCard> {
       );
     } else {
       this.container.addEventListener('click', () =>
-        this.events.emit('card:openClick', { card: this.cardId })
+      this.events.emit('card:openClick', { card: this.cardId })
       );
     }
 	}
@@ -71,8 +71,29 @@ export class Card extends Component<TModelCard> {
     this.setText(this.cardCategory, value);
   }
 
+  set categoryClass(value: string) {
+    switch(value) {
+      case 'софт-скил':
+      this.cardCategory.classList.add('card__category_soft');
+      break;
+      case 'другое':
+      this.cardCategory.classList.add('card__category_other');
+      break;
+      case 'дополнительное':
+      this.cardCategory.classList.add('card__category_additional');
+      break;
+      case 'кнопка':
+      this.cardCategory.classList.add('card__category_button');
+      break;
+      case 'хард-скил':
+      this.cardCategory.classList.add('card__category_hard');
+      break;
+    }
+  }
+
   set price(value: string) {
-    this.cardPrice.textContent = value + ' ' + 'синапсов';
+    value === null ? this.cardPrice.textContent = 'Бесценно' : this.cardPrice.textContent = value + ' ' + 'синапсов';
+    // this.cardPrice.textContent = value + ' ' + 'синапсов';
   }
 
   set index(value: string) {

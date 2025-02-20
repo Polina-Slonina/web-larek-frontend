@@ -1,5 +1,6 @@
 import { ICard, IOrder, IOrderResult } from '../types';
 import { Api, ApiListResponse} from './base/api';
+import { IEvents } from './base/events';
 
 export interface ICardAPI {
     getCardList: () => Promise<ICard[]>;
@@ -10,7 +11,7 @@ export interface ICardAPI {
 export class AppApi extends Api implements ICardAPI {
     readonly cdn: string;
 
-    constructor(cdn: string, baseUrl: string, options?: RequestInit) {
+    constructor(cdn: string, baseUrl: string,  options?: RequestInit) {
         super(baseUrl, options);
         this.cdn = cdn;
     }
@@ -30,6 +31,7 @@ export class AppApi extends Api implements ICardAPI {
 							...item,
 							image: this.cdn + item.image
 					}))
+                    
 				);
     }
 
