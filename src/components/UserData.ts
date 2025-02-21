@@ -26,14 +26,18 @@ export class UserData implements IUserData {
 
   getUserInfo(field: keyof IUser) {
 		return this.order[field];
-    // return { 
-    //   email: this.order.email,
-    //   phone: this.order.phone,
-    //   payment: this.order.payment,
-    //   address: this.order.address,
-		// 	items: this.order.items
-    // };
   }
+
+	setUserOrder() {
+	   this.order.payment = '';
+		 this.order.address = '';
+	}
+
+	setUserContact() {
+		this.order.phone = '';
+		this.order.email = '';
+ }
+
 
 	setInputField(field: keyof IUser, value: string) {
 		this.order[field] = value;

@@ -93,7 +93,6 @@ export class Card extends Component<TModelCard> {
 
   set price(value: string) {
     value === null ? this.cardPrice.textContent = 'Бесценно' : this.cardPrice.textContent = value + ' ' + 'синапсов';
-    // this.cardPrice.textContent = value + ' ' + 'синапсов';
   }
 
   set index(value: string) {

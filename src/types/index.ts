@@ -33,6 +33,8 @@ export interface ICardData {
 
 export interface IUserData {
   getUserInfo(field: keyof IUser): void;
+  setUserOrder(): void;
+  setUserContact(): void;
   setInputField(field: keyof IUser, value: string): void;
   validateOrder(): boolean;
 }

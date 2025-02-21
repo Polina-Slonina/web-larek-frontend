@@ -13,10 +13,17 @@ import { Basket } from './components/Basket';
 import { IUser } from './types';
 import { Form } from './components/Form';
 import { Success } from './components/Success';
+import { Order } from './components/Order';
+import { Contacts } from './components/Contacts';
 
 
 const events = new EventEmitter();
 const api = new AppApi(CDN_URL, API_URL);
+
+//константы для слушателей
+const event = {
+  'initialData: loaded': 'initialData: loaded'
+  }
 
 // Модель данных приложения
 const cardsData = new CardsData(events);
@@ -39,8 +46,8 @@ const cardsContainer = new CardsContainer(document.querySelector('.gallery'));
 // Переиспользуемые части интерфейса
 
 const basket = new Basket(cloneTemplate(modalTemplatebasket), events);
-const order = new Form<IUser>(cloneTemplate(formOrder), events)
-const contacts = new Form<IUser>(cloneTemplate(formContacts), events)
+const order = new Order(cloneTemplate(formOrder), events)
+const contacts = new Contacts(cloneTemplate(formContacts), events)
 
 // Чтобы мониторить все события, для отладки
 events.onAll((event) => {
@@ -51,14 +58,14 @@ events.onAll((event) => {
 api.getCardList()
 .then(card => {
   cardsData.cards = card;
-  events.emit('initialData:loaded');
+  events.emit(event['initialData: loaded']);
 })
 .catch(err => {
     console.error(err);
 });
 
 //после загрузки данных карточек с сервера выводим на страницу
-events.on('initialData:loaded', () => {
+events.on(event['initialData: loaded'], () => {
 	const cardsArray = cardsData.cards.map((card) => {
 		const cardCatalog = new Card(cloneTemplate(cardTemplateCatalog), events);
     cardCatalog.categoryClass = card.category;
@@ -132,9 +139,15 @@ events.on('modal:close', () => {
 
 // Открыть форму заказа
 events.on('order:open', () => {
-  // if(order.valid) order.valid = true
+  order.buttonPayment = '';
+  userData.setUserOrder();
   modalContainer.render({
-      content: order.render()
+      content: order.render({
+        address: '',
+        payment: '',
+        valid: false,
+        errors: []
+    })
   });
 });
 
@@ -159,9 +172,14 @@ events.on('button:paymentChanged', (button: HTMLButtonElement) => {
 
 // Открыть форму заказа
 events.on('order:submit', () => {
-  contacts.errors = '';
+  userData.setUserContact();
   modalContainer.render({
-      content: contacts.render()
+      content: contacts.render({
+        phone: '',
+        email: '',
+        valid: false,
+        errors: []
+    })
   });
 });
 

@@ -18,7 +18,7 @@ export class Form<T> extends Component<IForm> {
 
       this._submit = ensureElement<HTMLButtonElement>('button[type=submit]', this.container);
       this._errors = ensureElement<HTMLElement>('.form__errors', this.container);
-      this.buttonsAlt = this.container.querySelectorAll('.button_alt')
+      this.buttonsAlt = this.container.querySelectorAll('.button_alt');
 
       this.container.addEventListener('input', (e: Event) => {
           const target = e.target as HTMLInputElement;
@@ -52,11 +52,7 @@ export class Form<T> extends Component<IForm> {
 
   set buttonPayment(value: string) {
     this.buttonsAlt.forEach((button) => {
-     if ((button.name === value)) {
-      button.classList.toggle('button_alt-active')
-     } else {
-      button.classList.remove('button_alt-active')
-     }
+      button.name === value ? button.classList.toggle('button_alt-active') : button.classList.remove('button_alt-active');
     })
   }
 
@@ -67,4 +63,12 @@ export class Form<T> extends Component<IForm> {
   set errors(value: string) {
       this.setText(this._errors, value);
   }
+
+  render(state: Partial<T> & IForm) {
+    const {valid, errors, ...inputs} = state;
+    super.render({valid, errors});
+    Object.assign(this, inputs);
+    return this.container;
+  }
+  
 }
