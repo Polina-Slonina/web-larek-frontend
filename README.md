@@ -77,11 +77,9 @@ interface IUser {
 interface ICardData {
   cards: ICard[];
   preview: string | null;
-  addCard(card: TModelCard): void;
   getBasketItems(): void;
   getLengthBasket(): number;
   getBasketTotal(): number;
-  deleteCard(): TModelCard[];
   updateCard(card: TModelCard, value: boolean): void;
   updateCardId(cardId: string): void;
   getCard(cardId: string): TModelCard;
@@ -94,8 +92,10 @@ interface ICardData {
 Работа с данными Пользователя: сохранение, получение, валидация
 ```
 interface IUserData {
-   getUserInfo(field: keyof IUser): void;
-   setUserInfo(id: string[]): void;
+  getUserInfo(field: keyof IUser): void;
+  setInputField(field: keyof IUser, value: string): void;
+  validForm(data: string[]): boolean;
+  validateOrder(): boolean;
 }
 ```
 
@@ -286,6 +286,7 @@ interface IOrderResult {
 - `modal:open` - открытие модального окнаж
 - `modal:close` -  закрытие модального окна;
 - `basket:open` - открытие корзины;
+- `basket:changes` - изменениекорзины;
 - `card:delete` - удаление карточки из корзины;
 - `success:close` - закрытие окна на кнопку за новыми покупками;
 - `order:submit` / `contacts:submit` - самбит на кнопку формы ордер и контактов;

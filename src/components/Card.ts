@@ -3,7 +3,20 @@ import { ensureElement } from '../utils/utils';
 import { Component } from './base/Component';
 import { IEvents } from './base/events';
 
-export class Card extends Component<TModelCard> {
+interface ICardView { 
+  title: string;
+  image: string;
+  description: string;
+  buttonDisebled: boolean;
+  buttonText: boolean;
+  category: string;
+  // categoryClass: string;
+  price: string;
+  index: number;
+  id: string;
+}
+
+export class Card extends Component<ICardView> {
 	protected events: IEvents;
 	protected cardButton?: HTMLButtonElement;
 	protected cardDeleteButton?: HTMLButtonElement;
@@ -69,9 +82,11 @@ export class Card extends Component<TModelCard> {
 
   set category(value: string) {
     this.setText(this.cardCategory, value);
-  }
-
-  set categoryClass(value: string) {
+    Array.from(this.cardCategory.classList).forEach(className => {
+      if (className.startsWith('card__category_')) {
+        this.cardCategory.classList.remove(className);
+      }
+    });
     switch(value) {
       case 'софт-скил':
       this.cardCategory.classList.add('card__category_soft');
@@ -91,12 +106,32 @@ export class Card extends Component<TModelCard> {
     }
   }
 
+  // set categoryClass(value: string) {
+  //   switch(value) {
+  //     case 'софт-скил':
+  //     this.cardCategory.classList.add('card__category_soft');
+  //     break;
+  //     case 'другое':
+  //     this.cardCategory.classList.add('card__category_other');
+  //     break;
+  //     case 'дополнительное':
+  //     this.cardCategory.classList.add('card__category_additional');
+  //     break;
+  //     case 'кнопка':
+  //     this.cardCategory.classList.add('card__category_button');
+  //     break;
+  //     case 'хард-скил':
+  //     this.cardCategory.classList.add('card__category_hard');
+  //     break;
+  //   }
+  // }
+
   set price(value: string) {
     value === null ? this.cardPrice.textContent = 'Бесценно' : this.cardPrice.textContent = value + ' ' + 'синапсов';
   }
 
-  set index(value: string) {
-    this.itemIndex.textContent = value
+  set index(value: number) {
+    this.itemIndex.textContent = `${value}`
   }
 
   set id(value: string) {

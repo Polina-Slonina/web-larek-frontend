@@ -1,6 +1,11 @@
 import { ICard, ICardData, TModelCard } from "../types";
 import { IEvents } from "./base/events";
 
+//константы для слушателей
+export const event = {
+  'initialData: loaded': 'initialData: loaded'
+  }
+
 export class CardsData  implements ICardData {
   protected _cards: TModelCard[];
   protected _preview: string | null;
@@ -12,17 +17,12 @@ export class CardsData  implements ICardData {
 
     set cards(cards:ICard[]) {
       this._cards = cards.map(item => ({...item, selected: false}));
-      this.events.emit('cards:changed')
+      this.events.emit('cards:changed');
+      this.events.emit(event['initialData: loaded']);
     }
 
     get cards () {
       return this._cards;
-    }
-
-    addCard(card: TModelCard) {
-      this._cards = [card, ...this._cards]
-      this.events.emit('cards:changed')
-      this.events.emit('card:openClick')
     }
 
     getBasketItems() {
@@ -37,13 +37,9 @@ export class CardsData  implements ICardData {
       return this.getBasketItems().reduce((a, c) => a + c.price, 0)
     }
 
-    deleteCard() {
-      return this.getBasketItems();
-    }
-
     updateCard(card: TModelCard, value: boolean) {
        card.selected = value
-       this.events.emit('card:selected');
+       this.events.emit('basket:changes');
     }
 
     updateCardId(cardId: string) {
@@ -64,11 +60,8 @@ export class CardsData  implements ICardData {
       return selectedCard.map((card) => card.id)
     }
 
-    clearBasket(cardId: string[]) {
-      cardId.forEach((id) => {
-        const updateCard = this.getCard(id);
-        this.updateCard(updateCard, !updateCard.selected);
-      })
+    clearBasket() {
+      return this._cards.forEach((card) => this.updateCard(card, false))
     }
 
     get preview () {

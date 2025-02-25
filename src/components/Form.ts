@@ -5,20 +5,20 @@ import { IEvents } from "./base/events";
 
 interface IForm {
   valid: boolean;
-  errors: string[];
+  errors: string[] | string;
 }
 
 export class Form<T> extends Component<IForm> {
   protected _submit: HTMLButtonElement;
   protected _errors: HTMLElement;
-  protected buttonsAlt: NodeListOf<HTMLButtonElement>;
+  
 
   constructor(protected container: HTMLFormElement, protected events: IEvents) {
       super(container);
 
       this._submit = ensureElement<HTMLButtonElement>('button[type=submit]', this.container);
       this._errors = ensureElement<HTMLElement>('.form__errors', this.container);
-      this.buttonsAlt = this.container.querySelectorAll('.button_alt');
+      
 
       this.container.addEventListener('input', (e: Event) => {
           const target = e.target as HTMLInputElement;
@@ -27,15 +27,6 @@ export class Form<T> extends Component<IForm> {
           this.onInputChange(field, value);
       });
 
-      this.buttonsAlt.forEach((button) => {
-        button.addEventListener('click', (e: Event)=> {
-          const target = e.target as HTMLButtonElement;
-          const field = 'payment' as keyof T
-          const value: string = target.name ;
-          this.onInputChange(field, value);
-          this.events.emit(`button:paymentChanged`, button)
-        })
-      })
 
       this.container.addEventListener('submit', (e: Event) => {
           e.preventDefault();
@@ -50,12 +41,6 @@ export class Form<T> extends Component<IForm> {
       });
   }
 
-  set buttonPayment(value: string) {
-    this.buttonsAlt.forEach((button) => {
-      button.name === value ? button.classList.toggle('button_alt-active') : button.classList.remove('button_alt-active');
-    })
-  }
-
   set valid(value: boolean) {
       this._submit.disabled = !value;
   }
@@ -63,6 +48,10 @@ export class Form<T> extends Component<IForm> {
   set errors(value: string) {
       this.setText(this._errors, value);
   }
+
+  get errors() {
+    return this._errors.textContent;
+}
 
   render(state: Partial<T> & IForm) {
     const {valid, errors, ...inputs} = state;

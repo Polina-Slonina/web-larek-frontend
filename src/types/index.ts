@@ -18,11 +18,9 @@ export interface IUser {
 export interface ICardData {
   cards: ICard[];
   preview: string | null;
-  addCard(card: TModelCard): void;
   getBasketItems(): void;
   getLengthBasket(): number;
   getBasketTotal(): number;
-  deleteCard(): TModelCard[];
   updateCard(card: TModelCard, value: boolean): void;
   updateCardId(cardId: string): void;
   getCard(cardId: string): TModelCard;
@@ -33,10 +31,9 @@ export interface ICardData {
 
 export interface IUserData {
   getUserInfo(field: keyof IUser): void;
-  setUserOrder(): void;
-  setUserContact(): void;
   setInputField(field: keyof IUser, value: string): void;
-  validateOrder(): boolean;
+  validForm(data: string[]): boolean;
+  validateError(): void;
 }
 
 export type TModelCard = ICard & {selected: boolean}
@@ -48,10 +45,10 @@ export type IFormContact = Pick<IUser, 'email' | 'phone'>
 export interface IOrder extends IFormContact, IUser, IBasketTotal {
   items: string[];
 }
-export interface IForms extends IUser {
-  items: string[];
-}
-export type FormErrors = Partial<Record<keyof IForms, string>>;
+// export interface IForms extends IUser {
+//   items: string[];
+// }
+export type FormErrors = Partial<Record<keyof IUser, string>>;
 
 export interface IBasketTotal {
   total: number
