@@ -32,8 +32,8 @@ export interface ICardData {
 export interface IUserData {
   getUserInfo(field: keyof IUser): void;
   setInputField(field: keyof IUser, value: string): void;
-  validForm(data: string[]): boolean;
   validateError(): void;
+  clearUser(): void;
 }
 
 export type TModelCard = ICard & {selected: boolean}

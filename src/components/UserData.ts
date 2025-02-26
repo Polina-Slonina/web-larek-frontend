@@ -10,7 +10,7 @@ export class UserData implements IUserData {
 		address: '',
     payment: '',
 };
-	protected formErrors: FormErrors = {};
+	// protected formErrors: FormErrors = {};
 
   constructor(events: IEvents) {
 		this.events = events;
@@ -23,26 +23,16 @@ export class UserData implements IUserData {
 	}
 
   getUserInfo() {
-		return this.order = {
-			email: this.order.email,
-		  phone: this.order.phone,
-		  address: this.order.address,
-		  payment: this.order.payment,
-		}
+		return this.order;
   }
 
 	setInputField(field: keyof IUser, value: string) {
 		this.order[field] = value;
-		this.validateError()
-		this.events.emit('user:changed', this.formErrors);
+		this.events.emit('user:change');
   }
 
-	validForm(data: string[]): boolean {
-	 return data.some((i) => i === ''	)
-	}
-
 	validateError() {
-			const errors: typeof this.formErrors = {};
+			const errors: FormErrors = {};
 
 			if (!this.order.email) {
 					errors.email = 'Необходимо указать email';
@@ -56,9 +46,15 @@ export class UserData implements IUserData {
 			if (!this.order.payment) {
 				errors.address = 'Необходимо выбрать способ оплаты';
 		  }
-			 return this.formErrors = errors;
-			// this.events.emit('formErrors:change', this.formErrors);
-			console.log(errors)
-			// return Object.keys(errors).length === 0;
+			 return  errors;
 	}
+
+	clearUser() {
+    this.order = {
+        email: '',
+        phone: '',
+        address: '',
+        payment: '',
+    }
+  }
 }

@@ -13,7 +13,7 @@ export class Order extends Form<IUser> {
         button.addEventListener('click', (e: Event)=> {
           const target = e.target as HTMLButtonElement;
           const field = 'payment' as keyof IUser
-          const value: string = target.name ;
+          const value: string = target.name;
           this.buttonPayment(value)
           this.onInputChange(field, value);
         })

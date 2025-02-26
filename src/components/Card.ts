@@ -10,7 +10,6 @@ interface ICardView {
   buttonDisebled: boolean;
   buttonText: boolean;
   category: string;
-  // categoryClass: string;
   price: string;
   index: number;
   id: string;
@@ -105,26 +104,6 @@ export class Card extends Component<ICardView> {
       break;
     }
   }
-
-  // set categoryClass(value: string) {
-  //   switch(value) {
-  //     case 'софт-скил':
-  //     this.cardCategory.classList.add('card__category_soft');
-  //     break;
-  //     case 'другое':
-  //     this.cardCategory.classList.add('card__category_other');
-  //     break;
-  //     case 'дополнительное':
-  //     this.cardCategory.classList.add('card__category_additional');
-  //     break;
-  //     case 'кнопка':
-  //     this.cardCategory.classList.add('card__category_button');
-  //     break;
-  //     case 'хард-скил':
-  //     this.cardCategory.classList.add('card__category_hard');
-  //     break;
-  //   }
-  // }
 
   set price(value: string) {
     value === null ? this.cardPrice.textContent = 'Бесценно' : this.cardPrice.textContent = value + ' ' + 'синапсов';

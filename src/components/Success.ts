@@ -21,7 +21,7 @@ export class Success extends Component<ISuccess> {
     })
   }
 
-  set price(total: number) {
+  set total(total: number) {
     this.description.textContent =`Списано ${total} синапсов`;
 }
 

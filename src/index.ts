@@ -40,10 +40,11 @@ const modalContainer = new Modal(document.querySelector('#modal-container'), eve
 const cardsContainer = new CardsContainer(document.querySelector('.gallery'));
 
 // Переиспользуемые части интерфейса
-const cardPreview = new Card(cloneTemplate(cardTemplatePreview), events)
+const cardPreview = new Card(cloneTemplate(cardTemplatePreview), events);
 const basket = new Basket(cloneTemplate(modalTemplatebasket), events);
-const order = new Order(cloneTemplate(formOrder), events)
-const contacts = new Contacts(cloneTemplate(formContacts), events)
+const order = new Order(cloneTemplate(formOrder), events);
+const contacts = new Contacts(cloneTemplate(formContacts), events);
+const success = new Success(cloneTemplate(successContainer), events);
 
 // Чтобы мониторить все события, для отладки
 events.onAll((event) => {
@@ -65,11 +66,12 @@ events.on(event['initialData: loaded'], () => {
 	const cardsArray = cardsData.cards.map((card) => {
 		const cardCatalog = new Card(cloneTemplate(cardTemplateCatalog), events);
 		return cardCatalog.render({
-      title: card.title,
-      image: card.image,
-      category: card.category,
+      // title: card.title,
+      // image: card.image,
+      // category: card.category,
+      // id: card.id
+      ...card,
       price: `${card.price}`,
-      id: card.id
     });
 	});
 
@@ -81,13 +83,13 @@ events.on('card:openClick', ( data: {card: string}) => {
 	modalContainer.open();
   const cardId = data.card;
   const cardContent = cardsData.getCard(cardId);
-  // const cardPreview = new Card(cloneTemplate(cardTemplatePreview), events)
   cardContent.price === null ? cardPreview.buttonDisebled = true : cardPreview.buttonDisebled = false;
   modalContainer.content = cardPreview.render({
-    title: cardContent.title,
-    image: cardContent.image,
-    description: cardContent.description,
-    category: cardContent.category,
+    ...cardContent,
+    // title: cardContent.title,
+    // image: cardContent.image,
+    // description: cardContent.description,
+    // category: cardContent.category,
     price: `${cardContent.price}`,
     id: cardContent.id,
     buttonText: cardContent.selected,
@@ -149,38 +151,42 @@ events.on('modal:close', () => {
 
 // Открыть форму заказа
 events.on('order:open', () => {
+  const { address: addressError, payment: paymentError } = userData.validateError();
+  const { address, payment } = userData.getUserInfo();
   modalContainer.render({
       content: order.render({
         address: userData.getUserInfo().address,
         payment: userData.getUserInfo().payment,
-        valid: !userData.validForm([`${userData.getUserInfo().address}`, `${userData.getUserInfo().payment}`]),
-        errors: `${order.errors}`
+        valid: !(addressError || paymentError),
+        errors: !(address || payment) ? '' : Object.values({paymentError, addressError}).filter(i => !!i).join('; ')
     })
   });
 });
 
-// Изменилось состояние валидации формы
-events.on('user:changed', (errors: Partial<IUser>) => {
-  const { address, payment, phone, email } = errors;
-  order.valid = !userData.validForm([`${userData.getUserInfo().address}`, `${userData.getUserInfo().payment}`]);
+// Изменились данные пользователя
+events.on('user:change', (errors: Partial<IUser>) => {
+  const { address, payment, phone, email } = userData.validateError();
+  order.valid = !(address || payment),
   order.errors = Object.values({address, payment}).filter(i => !!i).join('; ');
-  contacts.valid = !userData.validForm([`${userData.getUserInfo().phone}`, `${userData.getUserInfo().email}`]);
+  contacts.valid = !(phone || email),
   contacts.errors = Object.values({phone, email}).filter(i => !!i).join('; ');
 });
 
 // Изменилось одно из полей формы ордер
-events.on(/^order\..*:change/, (data: { field: keyof IUser, value: string} ) => {
+events.on(/^order\..*:change/, (data: { field: keyof IUser, value: string } ) => {
   userData.setInputField(data.field, data.value);
 });
 
 // Открыть форму заказа
 events.on('order:submit', () => {
+  const { phone: phoneError, email: emailError } = userData.validateError();
+  const { phone, email } = userData.getUserInfo();
   modalContainer.render({
       content: contacts.render({
         phone: userData.getUserInfo().phone,
         email: userData.getUserInfo().email,
-        valid: !userData.validForm([`${userData.getUserInfo().phone}`, `${userData.getUserInfo().email}`]),
-        errors: `${contacts.errors}`
+        valid: !(phoneError || emailError),
+        errors: !(phone || email) ? '' : Object.values({phoneError, emailError}).filter(i => !!i).join('; ')
     })
   });
 });
@@ -193,21 +199,17 @@ events.on(/^contacts..*:change/, (data: { field: keyof IUser, value: string }) =
 // Отправлена форма заказа
 events.on('contacts:submit', () => {
   const orders = {
-    payment: userData.getUserInfo().payment,
-    email: userData.getUserInfo().email,
-    phone: userData.getUserInfo().phone,
-    address: userData.getUserInfo().address,
+    ...userData.getUserInfo(),
     total: cardsData.getBasketTotal(),
     items: cardsData.getIdSelectedCard()
   };
   api.order(orders)
       .then((res) => {
-          const success = new Success(cloneTemplate(successContainer), events);
-          success.price = orders.total;
           modalContainer.render({
-              content: success.render({})
+              content: success.render({total: res.total})
           });
           cardsData.clearBasket();
+          userData.clearUser();
       })
       .catch(err => {
           console.error(err);
