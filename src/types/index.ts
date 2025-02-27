@@ -45,9 +45,7 @@ export type IFormContact = Pick<IUser, 'email' | 'phone'>
 export interface IOrder extends IFormContact, IUser, IBasketTotal {
   items: string[];
 }
-// export interface IForms extends IUser {
-//   items: string[];
-// }
+
 export type FormErrors = Partial<Record<keyof IUser, string>>;
 
 export interface IBasketTotal {

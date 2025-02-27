@@ -10,7 +10,7 @@ interface ICardView {
   buttonDisebled: boolean;
   buttonText: boolean;
   category: string;
-  price: string;
+  price: number;
   index: number;
   id: string;
 }
@@ -105,7 +105,7 @@ export class Card extends Component<ICardView> {
     }
   }
 
-  set price(value: string) {
+  set price(value: number) {
     value === null ? this.cardPrice.textContent = 'Бесценно' : this.cardPrice.textContent = value + ' ' + 'синапсов';
   }
 

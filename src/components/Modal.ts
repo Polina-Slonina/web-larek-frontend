@@ -31,14 +31,14 @@ export class Modal extends Component<IModal> {
   
     open() {
       this.container.classList.add("modal_active");
-      this.events.emit('modal:open');
+      // this.events.emit('modal:open');
       document.addEventListener("keyup", this.handleEscUp);
         }
   
     close() {
       this.container.classList.remove("modal_active");
       this.content = null;
-      this.events.emit('modal:close');
+      // this.events.emit('modal:close');
       document.removeEventListener("keyup", this.handleEscUp);
     }
   

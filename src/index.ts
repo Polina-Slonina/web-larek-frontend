@@ -65,14 +65,7 @@ api.getCardList()
 events.on(event['initialData: loaded'], () => {
 	const cardsArray = cardsData.cards.map((card) => {
 		const cardCatalog = new Card(cloneTemplate(cardTemplateCatalog), events);
-		return cardCatalog.render({
-      // title: card.title,
-      // image: card.image,
-      // category: card.category,
-      // id: card.id
-      ...card,
-      price: `${card.price}`,
-    });
+		return cardCatalog.render(card);
 	});
 
 	cardsContainer.render({ catalog: cardsArray });
@@ -80,20 +73,14 @@ events.on(event['initialData: loaded'], () => {
 
 //открытие превью карточки
 events.on('card:openClick', ( data: {card: string}) => {
-	modalContainer.open();
-  const cardId = data.card;
-  const cardContent = cardsData.getCard(cardId);
-  cardContent.price === null ? cardPreview.buttonDisebled = true : cardPreview.buttonDisebled = false;
-  modalContainer.content = cardPreview.render({
-    ...cardContent,
-    // title: cardContent.title,
-    // image: cardContent.image,
-    // description: cardContent.description,
-    // category: cardContent.category,
-    price: `${cardContent.price}`,
-    id: cardContent.id,
-    buttonText: cardContent.selected,
-  });
+  modalContainer.open();
+const cardId = data.card;
+const cardContent = cardsData.getCard(cardId);
+modalContainer.content = cardPreview.render({
+  ...cardContent,
+  buttonText: cardContent.selected,
+  buttonDisebled: cardContent.price === null
+});
 })
 
 // клик для закрытия модального окна
@@ -117,7 +104,7 @@ events.on('basket:changes', () => {
 		const cardCatalog = new Card(cloneTemplate(cardTemplateBasket), events);
 		return cardCatalog.render({
       title: card.title,
-      price: `${card.price}`,
+      price: card.price,
       id: card.id,
       index: id + 1
     });
@@ -139,15 +126,15 @@ events.on('card:delete', (data: {card: string}) => {
   
 });
 
-// Блокируем прокрутку страницы если открыта модалка
-events.on('modal:open', () => {
-  page.locked = true;
-});
+// // Блокируем прокрутку страницы если открыта модалка
+// events.on('modal:open', () => {
+//   page.locked = true;
+// });
 
-// ... и разблокируем
-events.on('modal:close', () => {
-  page.locked = false;
-});
+// // ... и разблокируем
+// events.on('modal:close', () => {
+//   page.locked = false;
+// });
 
 // Открыть форму заказа
 events.on('order:open', () => {
