@@ -197,6 +197,7 @@ events.on('contacts:submit', () => {
           });
           cardsData.clearBasket();
           userData.clearUser();
+          order.buttonInactive();
       })
       .catch(err => {
           console.error(err);

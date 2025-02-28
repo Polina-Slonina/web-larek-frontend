@@ -29,4 +29,8 @@ export class Order extends Form<IUser> {
       button.name === value ? button.classList.add('button_alt-active') : button.classList.remove('button_alt-active');
     })
   }
+
+  buttonInactive() {
+    this.buttonsAlt.forEach((button) => button.classList.remove('button_alt-active'))
+  }
 }
